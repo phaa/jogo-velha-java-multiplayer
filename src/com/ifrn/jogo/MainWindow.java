@@ -31,7 +31,7 @@ public class MainWindow extends javax.swing.JFrame {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     System.out.println("Vc me clicou");
-                    if(step%2 == 0) {
+                    if(step%2 == 0) { 
                         label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ifrn/assets/circle.png"))); // NOI18N
                     } else {
                         label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ifrn/assets/cross.png"))); // NOI18N
