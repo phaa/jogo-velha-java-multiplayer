@@ -4,17 +4,43 @@
  */
 package com.ifrn.jogo;
 
+import java.awt.Component;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import javax.swing.JLabel;
+
 /**
  *
  * @author pedro
  */
 public class MainWindow extends javax.swing.JFrame {
 
+    private ArrayList<JLabel> tiles = new ArrayList(9);
+    private int step = 0;
+
     /**
      * Creates new form NewJFrame
      */
     public MainWindow() {
         initComponents();
+
+        for (Component c : this.tilesPanel.getComponents()) {
+            final JLabel label = (JLabel) c;
+            label.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    System.out.println("Vc me clicou");
+                    if(step%2 == 0) {
+                        label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ifrn/assets/circle.png"))); // NOI18N
+                    } else {
+                        label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ifrn/assets/cross.png"))); // NOI18N
+                    }
+                    step++;
+                }
+            });
+            this.tiles.add(label);
+        }
     }
 
     /**
@@ -37,6 +63,13 @@ public class MainWindow extends javax.swing.JFrame {
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -53,62 +86,111 @@ public class MainWindow extends javax.swing.JFrame {
         tilesPanel.setBackground(new java.awt.Color(218, 218, 218));
         tilesPanel.setLayout(new java.awt.GridLayout(3, 3, 3, 3));
 
+        jLabel1.setBackground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ifrn/assets/circle.png"))); // NOI18N
+        jLabel1.setOpaque(true);
         tilesPanel.add(jLabel1);
 
+        jLabel2.setBackground(new java.awt.Color(255, 255, 255));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ifrn/assets/cross.png"))); // NOI18N
+        jLabel2.setOpaque(true);
         tilesPanel.add(jLabel2);
 
+        jLabel3.setBackground(new java.awt.Color(255, 255, 255));
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ifrn/assets/circle.png"))); // NOI18N
+        jLabel3.setOpaque(true);
         tilesPanel.add(jLabel3);
 
+        jLabel4.setBackground(new java.awt.Color(255, 255, 255));
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ifrn/assets/circle.png"))); // NOI18N
+        jLabel4.setOpaque(true);
         tilesPanel.add(jLabel4);
 
+        jLabel5.setBackground(new java.awt.Color(255, 255, 255));
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ifrn/assets/cross.png"))); // NOI18N
+        jLabel5.setOpaque(true);
         tilesPanel.add(jLabel5);
 
+        jLabel6.setBackground(new java.awt.Color(255, 255, 255));
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ifrn/assets/circle.png"))); // NOI18N
+        jLabel6.setOpaque(true);
         tilesPanel.add(jLabel6);
 
+        jLabel7.setBackground(new java.awt.Color(255, 255, 255));
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ifrn/assets/cross.png"))); // NOI18N
+        jLabel7.setOpaque(true);
         tilesPanel.add(jLabel7);
 
+        jLabel8.setBackground(new java.awt.Color(255, 255, 255));
         jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ifrn/assets/circle.png"))); // NOI18N
+        jLabel8.setOpaque(true);
         tilesPanel.add(jLabel8);
 
+        jLabel9.setBackground(new java.awt.Color(255, 255, 255));
         jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ifrn/assets/cross.png"))); // NOI18N
+        jLabel9.setOpaque(true);
         tilesPanel.add(jLabel9);
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setLayout(new java.awt.GridLayout(2, 3));
+
+        jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ifrn/assets/circle_small.png"))); // NOI18N
+        jPanel1.add(jLabel10);
+
+        jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ifrn/assets/cross_small.png"))); // NOI18N
+        jPanel1.add(jLabel11);
+
+        jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ifrn/assets/scale_small.png"))); // NOI18N
+        jPanel1.add(jLabel12);
+
+        jLabel13.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 16)); // NOI18N
+        jLabel13.setForeground(new java.awt.Color(59, 188, 212));
+        jLabel13.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel13.setText("ganhou 2");
+        jLabel13.setPreferredSize(new java.awt.Dimension(20, 20));
+        jPanel1.add(jLabel13);
+
+        jLabel14.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 16)); // NOI18N
+        jLabel14.setForeground(new java.awt.Color(57, 137, 212));
+        jLabel14.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel14.setText("ganhou 2");
+        jLabel14.setPreferredSize(new java.awt.Dimension(20, 20));
+        jPanel1.add(jLabel14);
+
+        jLabel15.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 16)); // NOI18N
+        jLabel15.setForeground(new java.awt.Color(218, 218, 218));
+        jLabel15.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel15.setText("empatou 2");
+        jLabel15.setPreferredSize(new java.awt.Dimension(20, 20));
+        jPanel1.add(jLabel15);
 
         javax.swing.GroupLayout bgPanelLayout = new javax.swing.GroupLayout(bgPanel);
         bgPanel.setLayout(bgPanelLayout);
         bgPanelLayout.setHorizontalGroup(
             bgPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bgPanelLayout.createSequentialGroup()
-                .addContainerGap(125, Short.MAX_VALUE)
-                .addComponent(tilesPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(125, 125, 125))
+                .addContainerGap(70, Short.MAX_VALUE)
+                .addGroup(bgPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(tilesPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(70, 70, 70))
         );
         bgPanelLayout.setVerticalGroup(
             bgPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(bgPanelLayout.createSequentialGroup()
-                .addGap(57, 57, 57)
+                .addGap(20, 20, 20)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(tilesPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(70, Short.MAX_VALUE))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
 
-        jMenuBar1.setBackground(new java.awt.Color(255, 255, 255));
         jMenuBar1.setBorder(null);
         jMenuBar1.setBorderPainted(false);
+        jMenuBar1.setOpaque(true);
 
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
@@ -173,6 +255,12 @@ public class MainWindow extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bgPanel;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -184,6 +272,7 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel tilesPanel;
     // End of variables declaration//GEN-END:variables
 }
