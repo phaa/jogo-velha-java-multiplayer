@@ -3,18 +3,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.ifrn.jogo;
-
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Arrays;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.JFrame;
 
 /**
  *
  * @author pedro
  */
-public class MainWindow extends JFrame implements ActionListener {
+public class MainWindow1 extends JFrame {
 
     private CustomButton tiles[] = new CustomButton[9];
     private int step = 0;
@@ -22,106 +19,13 @@ public class MainWindow extends JFrame implements ActionListener {
     /**
      * Creates new form NewJFrame
      */
-    public MainWindow() {
+    public MainWindow1() {
         initComponents();
 
         // Seta os listners em cada label
-        CustomButton btn;
-        for (int i = 0; i < 9; i++) {
-            btn = new CustomButton();
-            btn.setBackground(Color.WHITE);
-            btn.setBorder(null);
-            btn.addActionListener(this);
-            this.tiles[i] = btn;
-            this.tilesPanel.add(btn);
-        }
-
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        System.out.println("Vc me clicou");
-        CustomButton btn = this.getClickSource(e);
-
-        if (step == 8) {
-            //encerra o jogo
-            System.out.println("game over");
-        }
-
-        // Ninguém escolheu esse 
-        if (btn.getType() == "") {
-            if (step % 2 == 0) {
-                btn.setType("o");
-            } else {
-                btn.setType("x"); 
-            }
-            step++;
-            this.checkWinner();
-        }
-    }
-
-    private CustomButton getClickSource(ActionEvent e) {
-        for (int i = 0; i < 9; i++) {
-            if (e.getSource() == this.tiles[i]) {
-                return this.tiles[i];
-            }
-        }
-        return null;
-    }
-
-    private String checkWinner() {
-        for (int a = 0; a < 8; a++) {
-            String line = "";
-
-            switch (a) {
-                case 0:
-                    line = this.tiles[0].getType() + this.tiles[1].getType() + this.tiles[2].getType();
-                    break;
-                case 1:
-                    line = this.tiles[3].getType() + this.tiles[4].getType() + this.tiles[5].getType();
-                    break;
-                case 2:
-                    line = this.tiles[6].getType() + this.tiles[7].getType() + this.tiles[8].getType();
-                    break;
-                case 3:
-                    line = this.tiles[0].getType() + this.tiles[3].getType() + this.tiles[6].getType();
-                    break;
-                case 4:
-                    line = this.tiles[1].getType() + this.tiles[4].getType() + this.tiles[7].getType();
-                    break;
-                case 5:
-                    line = this.tiles[2].getType() + this.tiles[5].getType() + this.tiles[8].getType();
-                    break;
-                case 6:
-                    line = this.tiles[0].getType() + this.tiles[4].getType() + this.tiles[8].getType();
-                    break;
-                case 7:
-                    line = this.tiles[2].getType() + this.tiles[4].getType() + this.tiles[6].getType();
-                    break;
-            }
-            //For X winner
-            if (line.equals("xxx")) {
-                System.out.println("Vencedor x");
-                return "o";
-            } // For O winner
-            else if (line.equals("ooo")) {
-                System.out.println("Vencedor o");
-                return "o";
-            }
-        }
-
-        /**
-         
-        for (int a = 0; a < 9; a++) {
-            if (Arrays.asList(this.tiles).contains( String.valueOf(a + 1) )) {
-                break;
-            } else if (a == 8) {
-                return "draw";
-            }
-        }
-        */
-
-        return null;
+        
+        
+        
     }
 
     /**
@@ -135,6 +39,7 @@ public class MainWindow extends JFrame implements ActionListener {
 
         bgPanel = new javax.swing.JPanel();
         tilesPanel = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
@@ -157,6 +62,11 @@ public class MainWindow extends JFrame implements ActionListener {
 
         tilesPanel.setBackground(new java.awt.Color(218, 218, 218));
         tilesPanel.setLayout(new java.awt.GridLayout(3, 3, 3, 3));
+
+        jButton1.setBackground(new java.awt.Color(255, 255, 255));
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ifrn/assets/circle.png"))); // NOI18N
+        jButton1.setBorder(null);
+        tilesPanel.add(jButton1);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new java.awt.GridLayout(2, 3));
@@ -273,13 +183,14 @@ public class MainWindow extends JFrame implements ActionListener {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MainWindow().setVisible(true);
+                new MainWindow1().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bgPanel;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
