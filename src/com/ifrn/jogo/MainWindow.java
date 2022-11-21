@@ -18,6 +18,7 @@ public class MainWindow extends JFrame implements ActionListener {
 
     private CustomButton tiles[] = new CustomButton[9];
     private int step = 0;
+    private boolean circleTurn = true;
 
     /**
      * Creates new form NewJFrame
@@ -40,17 +41,18 @@ public class MainWindow extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        System.out.println("Vc me clicou");
         CustomButton btn = this.getClickSource(e);
-
-        if (step == 8) {
+        System.out.println(this.step);
+        
+        if (step == 9) {
             //encerra o jogo
             System.out.println("game over");
+            return;
         }
 
         // Ninguém escolheu esse 
-        if (btn.getType() == "") {
-            if (step % 2 == 0) {
+        if (btn.getType().equals("")) {
+            if (this.circleTurn) {
                 btn.setType("o");
             } else {
                 btn.setType("x"); 
