@@ -1,14 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package com.ifrn.jogo;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -17,8 +13,7 @@ import javax.swing.JFrame;
 public class MainWindow extends JFrame implements ActionListener {
 
     private CustomButton tiles[] = new CustomButton[9];
-    private int step = 0;
-    private boolean circleTurn = true;
+    private TableManager manager;
 
     /**
      * Creates new form NewJFrame
@@ -36,96 +31,38 @@ public class MainWindow extends JFrame implements ActionListener {
             this.tiles[i] = btn;
             this.tilesPanel.add(btn);
         }
-
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        CustomButton btn = this.getClickSource(e);
-        System.out.println(this.step);
         
-        if (step == 9) {
-            //encerra o jogo
-            System.out.println("game over");
-            return;
-        }
-
-        // Ninguém escolheu esse 
-        if (btn.getType().equals("")) {
-            if (this.circleTurn) {
-                btn.setType("o");
-            } else {
-                btn.setType("x"); 
-            }
-            step++;
-            this.checkWinner();
-        }
+        this.manager = new TableManager("o", tiles);
+        
+    }
+    
+    private void renderTiles() {
+        
     }
 
-    private CustomButton getClickSource(ActionEvent e) {
-        for (int i = 0; i < 9; i++) {
-            if (e.getSource() == this.tiles[i]) {
-                return this.tiles[i];
-            }
-        }
-        return null;
-    }
-
-    private String checkWinner() {
-        for (int a = 0; a < 8; a++) {
-            String line = "";
-
-            switch (a) {
-                case 0:
-                    line = this.tiles[0].getType() + this.tiles[1].getType() + this.tiles[2].getType();
-                    break;
-                case 1:
-                    line = this.tiles[3].getType() + this.tiles[4].getType() + this.tiles[5].getType();
-                    break;
-                case 2:
-                    line = this.tiles[6].getType() + this.tiles[7].getType() + this.tiles[8].getType();
-                    break;
-                case 3:
-                    line = this.tiles[0].getType() + this.tiles[3].getType() + this.tiles[6].getType();
-                    break;
-                case 4:
-                    line = this.tiles[1].getType() + this.tiles[4].getType() + this.tiles[7].getType();
-                    break;
-                case 5:
-                    line = this.tiles[2].getType() + this.tiles[5].getType() + this.tiles[8].getType();
-                    break;
-                case 6:
-                    line = this.tiles[0].getType() + this.tiles[4].getType() + this.tiles[8].getType();
-                    break;
-                case 7:
-                    line = this.tiles[2].getType() + this.tiles[4].getType() + this.tiles[6].getType();
-                    break;
-            }
-            //For X winner
-            if (line.equals("xxx")) {
-                System.out.println("Vencedor x");
-                return "o";
-            } // For O winner
-            else if (line.equals("ooo")) {
-                System.out.println("Vencedor o");
-                return "o";
-            }
-        }
-
-        /**
-         
-        for (int a = 0; a < 9; a++) {
-            if (Arrays.asList(this.tiles).contains( String.valueOf(a + 1) )) {
+    @Override    
+    public void actionPerformed(ActionEvent e) {
+        CustomButton btn = this.tiles[0];
+        
+        int position;
+        for (position = 0; position < 9; position++) {
+            if (e.getSource() == this.tiles[position]) {
+                btn = this.tiles[position];
                 break;
-            } else if (a == 8) {
-                return "draw";
             }
         }
-        */
-
-        return null;
+        
+        if(this.manager.nextTurn(position)) {
+            //btn.setType(this.manager.getCurrentSymbol());
+            //this.manager.flipSymbol();
+            
+            if(this.manager.hasWinner()) {
+                JOptionPane.showMessageDialog(this, "Ganhador: " + this.manager.getWinner());
+            }
+        }
+        
     }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -146,6 +83,7 @@ public class MainWindow extends JFrame implements ActionListener {
         jLabel15 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -217,10 +155,21 @@ public class MainWindow extends JFrame implements ActionListener {
                 .addContainerGap(26, Short.MAX_VALUE))
         );
 
+        jMenuBar1.setBackground(new java.awt.Color(255, 255, 255));
         jMenuBar1.setBorder(null);
         jMenuBar1.setBorderPainted(false);
+        jMenuBar1.setOpaque(false);
 
-        jMenu1.setText("File");
+        jMenu1.setText("Menu");
+
+        jMenuItem1.setText("Procurar Jogador");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem1);
+
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Edit");
@@ -241,6 +190,10 @@ public class MainWindow extends JFrame implements ActionListener {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -291,6 +244,7 @@ public class MainWindow extends JFrame implements ActionListener {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel tilesPanel;
     // End of variables declaration//GEN-END:variables
