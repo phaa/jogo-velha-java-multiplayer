@@ -3,6 +3,13 @@ package com.ifrn.jogo;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -10,18 +17,30 @@ import javax.swing.JOptionPane;
  *
  * @author pedro
  */
-public class MainWindow extends JFrame implements ActionListener {
+public class GameUI extends JFrame implements ActionListener {
 
     private CustomButton tiles[] = new CustomButton[9];
-    private TableManager manager;
+    private CustomButton currentTile;
+    private boolean iWonLast = false;
+
+    private char icon;
+    private char opponentIcon;
+
+    private final int PORT = 5000;
+    private Socket socket;
+    private BufferedReader in;
+    private PrintWriter out;
 
     /**
      * Creates new form NewJFrame
      */
-    public MainWindow() {
-        initComponents();
+    public GameUI() {
+        this.initComponents();
+        this.initTiles();
+        this.initIO();
+    }
 
-        // Seta os listners em cada label
+    private void initTiles() {
         CustomButton btn;
         for (int i = 0; i < 9; i++) {
             btn = new CustomButton();
@@ -31,19 +50,25 @@ public class MainWindow extends JFrame implements ActionListener {
             this.tiles[i] = btn;
             this.tilesPanel.add(btn);
         }
-        
-        this.manager = new TableManager("o", tiles);
-        
-    }
-    
-    private void renderTiles() {
-        
     }
 
-    @Override    
+    private void initIO() {
+        try {
+            // Setup networking
+            System.out.println("Starting client IO");
+            this.socket = new Socket("localhost", PORT);
+            this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            this.out = new PrintWriter(socket.getOutputStream(), true);
+            System.out.println("Client IO sucessfully started");
+        } catch (IOException ex) {
+            Logger.getLogger(GameUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Override
     public void actionPerformed(ActionEvent e) {
         CustomButton btn = this.tiles[0];
-        
+
         int position;
         for (position = 0; position < 9; position++) {
             if (e.getSource() == this.tiles[position]) {
@@ -51,18 +76,123 @@ public class MainWindow extends JFrame implements ActionListener {
                 break;
             }
         }
+
+        this.currentTile = btn;
+        // Previne que o botão possa ser afetado pelo efeito hover
+        btn.lock();
         
-        if(this.manager.nextTurn(position)) {
-            //btn.setType(this.manager.getCurrentSymbol());
-            //this.manager.flipSymbol();
-            
-            if(this.manager.hasWinner()) {
-                JOptionPane.showMessageDialog(this, "Ganhador: " + this.manager.getWinner());
+        this.out.println("MOVE " + position);
+    }
+
+    public void initHoverEffect() {
+        for (CustomButton btn : this.tiles) {
+            btn.addMouseListener(new java.awt.event.MouseAdapter() {
+                public void mouseEntered(java.awt.event.MouseEvent evt) {
+                    if (!btn.isLocked()) {
+                        btn.setFadedCover(icon);
+                    }
+                }
+
+                public void mouseExited(java.awt.event.MouseEvent evt) {
+                    if (!btn.isLocked()) {
+                        btn.setIcon(null);
+                    }
+                }
+            });
+        }
+    }
+
+    public void startNetListening() {
+        String response;
+        try {
+            response = this.in.readLine();
+            if (response.startsWith("WELCOME")) {
+                char mark = response.charAt(8);
+                this.icon = mark;
+                this.opponentIcon = (mark == 'X') ? 'O' : 'X';
+                this.initHoverEffect();
+            }
+            while (true) {
+                response = this.in.readLine();
+                if (response.startsWith("VALID_MOVE")) {
+                    messageLabel.setText("Você já jogou, por favor espere");
+                    this.currentTile.setType(icon);
+                    this.currentTile.repaint();
+                } 
+                else if (response.startsWith("OPPONENT_MOVED")) {
+                    int location = Integer.parseInt(response.substring(15));
+                    this.tiles[location].setType(opponentIcon);
+                    this.tiles[location].lock();
+                    this.tiles[location].repaint();
+                    this.messageLabel.setText("Seu oponente jogou, sua vez");
+                } 
+                else if (response.startsWith("VICTORY")) {
+                    System.out.println(response);
+                    this.messageLabel.setText("Você ganhou");
+                    this.iWonLast = true;
+                    this.wantsToPlayAgain();
+                } 
+                else if (response.startsWith("DEFEAT")) {
+                    System.out.println(response);
+                    this.messageLabel.setText("Você perdeu");
+                    this.iWonLast = false;
+                    this.wantsToPlayAgain();
+                } 
+                else if (response.startsWith("TIE")) {
+                    System.out.println(response);
+                    this.messageLabel.setText("Empate");
+                    this.wantsToPlayAgain();
+                } 
+                else if (response.startsWith("MESSAGE")) {
+                    this.messageLabel.setText(response.substring(8));
+                }
+                else if (response.startsWith("SCOREBOARD")) {
+                    this.updateScoreBoard(response);
+                }
+            }
+            // se eu mandar sair eu perco meus dados por reseta a conexao
+            //this.out.println("QUIT");
+        } catch (IOException ex) {
+            Logger.getLogger(GameUI.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                this.socket.close();
+            } catch (IOException ex) {
+                Logger.getLogger(GameUI.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+    }
+
+    private void wantsToPlayAgain() {
+        int response = JOptionPane.showConfirmDialog(this,
+                "Quer jogar denovo?",
+                "Jogo da velha é diversão",
+                JOptionPane.YES_NO_OPTION);
+
+        if (response == JOptionPane.YES_OPTION) {
+            this.resetGame();
+            this.out.println("SCOREBOARD");
+        } else {
+            this.out.println("QUIT");
+            this.dispose();
+        }
+    }
+
+    private void resetGame() {
+        for (CustomButton btn : this.tiles) {
+            btn.setIcon(null);
+            btn.unlock();
+        }
+        this.messageLabel.setText(this.iWonLast ? "Sua vez" : "");
     }
     
+    private void updateScoreBoard(String response) {
+        String[] info = response.split(":");
+        this.crossScore.setText("ganhou " + info[1]);
+        this.circleScore.setText("ganhou " + info[2]);
+        this.tiesCount.setText("empatou " + info[3]);
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -78,9 +208,10 @@ public class MainWindow extends JFrame implements ActionListener {
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
+        circleScore = new javax.swing.JLabel();
+        crossScore = new javax.swing.JLabel();
+        tiesCount = new javax.swing.JLabel();
+        messageLabel = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -113,36 +244,39 @@ public class MainWindow extends JFrame implements ActionListener {
         jLabel12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ifrn/assets/scale_small.png"))); // NOI18N
         jPanel1.add(jLabel12);
 
-        jLabel13.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 16)); // NOI18N
-        jLabel13.setForeground(new java.awt.Color(59, 188, 212));
-        jLabel13.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel13.setText("ganhou 2");
-        jLabel13.setPreferredSize(new java.awt.Dimension(20, 20));
-        jPanel1.add(jLabel13);
+        circleScore.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 16)); // NOI18N
+        circleScore.setForeground(new java.awt.Color(59, 188, 212));
+        circleScore.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        circleScore.setText("ganhou 0");
+        circleScore.setPreferredSize(new java.awt.Dimension(20, 20));
+        jPanel1.add(circleScore);
 
-        jLabel14.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 16)); // NOI18N
-        jLabel14.setForeground(new java.awt.Color(57, 137, 212));
-        jLabel14.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel14.setText("ganhou 2");
-        jLabel14.setPreferredSize(new java.awt.Dimension(20, 20));
-        jPanel1.add(jLabel14);
+        crossScore.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 16)); // NOI18N
+        crossScore.setForeground(new java.awt.Color(57, 137, 212));
+        crossScore.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        crossScore.setText("ganhou 0");
+        crossScore.setPreferredSize(new java.awt.Dimension(20, 20));
+        jPanel1.add(crossScore);
 
-        jLabel15.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 16)); // NOI18N
-        jLabel15.setForeground(new java.awt.Color(218, 218, 218));
-        jLabel15.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel15.setText("empatou 2");
-        jLabel15.setPreferredSize(new java.awt.Dimension(20, 20));
-        jPanel1.add(jLabel15);
+        tiesCount.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 16)); // NOI18N
+        tiesCount.setForeground(new java.awt.Color(218, 218, 218));
+        tiesCount.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        tiesCount.setText("empatou 0");
+        tiesCount.setPreferredSize(new java.awt.Dimension(20, 20));
+        jPanel1.add(tiesCount);
+
+        messageLabel.setText(" ");
 
         javax.swing.GroupLayout bgPanelLayout = new javax.swing.GroupLayout(bgPanel);
         bgPanel.setLayout(bgPanelLayout);
         bgPanelLayout.setHorizontalGroup(
             bgPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bgPanelLayout.createSequentialGroup()
-                .addContainerGap(70, Short.MAX_VALUE)
+                .addGap(70, 70, 70)
                 .addGroup(bgPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(tilesPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(tilesPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(messageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(70, 70, 70))
         );
         bgPanelLayout.setVerticalGroup(
@@ -152,7 +286,9 @@ public class MainWindow extends JFrame implements ActionListener {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(tilesPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(messageLabel)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jMenuBar1.setBackground(new java.awt.Color(255, 255, 255));
@@ -225,27 +361,34 @@ public class MainWindow extends JFrame implements ActionListener {
         //</editor-fold>
         //</editor-fold>
 
-        /* Create and display the form */
+        while (true) {
+            GameUI game = new GameUI();
+            game.setVisible(true);
+            game.startNetListening();
+        }
+
+        /* Create and display the form 
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MainWindow().setVisible(true);
+                
             }
-        });
+        });*/
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bgPanel;
+    private javax.swing.JLabel circleScore;
+    private javax.swing.JLabel crossScore;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel messageLabel;
+    private javax.swing.JLabel tiesCount;
     private javax.swing.JPanel tilesPanel;
     // End of variables declaration//GEN-END:variables
 }

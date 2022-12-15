@@ -14,23 +14,44 @@ import javax.swing.JButton;
 
 public class CustomButton extends JButton {
     
-    private String type = "";
+    private char type;
+    private boolean locked = false;
     
     public CustomButton() {
         super();
     }
     
-    public void setType(String type) {
+    public void setType(char type) {
         this.type = type;
-        if("o".equals(type)) {
+        if(type == 'O') {
             this.setIcon(new ImageIcon(getClass().getResource("/com/ifrn/assets/circle.png")));
-        } else if("x".equals(type)) {
+        } else if(type == 'X') {
             this.setIcon(new ImageIcon(getClass().getResource("/com/ifrn/assets/cross.png"))); // NOI18N
+        } 
+    }
+    
+    public void setFadedCover(char type) {
+        if(type == 'O') {
+            this.setIcon(new ImageIcon(getClass().getResource("/com/ifrn/assets/circle_faded.png"))); // NOI18N
+        } else if(type == 'X') {
+            this.setIcon(new ImageIcon(getClass().getResource("/com/ifrn/assets/cross_faded.png"))); // NOI18N
         }
     }
     
-    public String getType() {
+    public char getType() {
         return this.type;
+    }
+    
+    public void lock() {
+        this.locked = true;
+    }
+    
+    public void unlock() {
+        this.locked = false;
+    }
+    
+    public boolean isLocked() {
+        return this.locked;
     }
     
 }
