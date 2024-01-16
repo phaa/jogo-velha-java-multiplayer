@@ -59,10 +59,13 @@ public class ServerSidePlayer extends Thread {
             while (true) {
                 String command = input.readLine();
                 System.out.println(command);
-                if (command.startsWith("MOVE")) {
+                
+                
+                
+                if (command.startsWith("MOVE" )) {
                     int location = Integer.parseInt(command.substring(5));
                     if (this.game.legalMove(location, this)) {
-                        output.println("VALID_MOVE");
+                        this.output.println("VALID_MOVE");
                         //String response = this.game.checkWinner() ? "VICTORY" : this.game.boardFilledUp() ? "TIE" : "";
 
                         String response;

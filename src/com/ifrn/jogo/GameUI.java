@@ -114,6 +114,7 @@ public class GameUI extends JFrame implements ActionListener {
             }
             while (true) {
                 response = this.in.readLine();
+                
                 if (response.startsWith("VALID_MOVE")) {
                     messageLabel.setText("Você já jogou, por favor espere");
                     this.currentTile.setType(icon);
